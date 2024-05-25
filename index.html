@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paw Pics</title>
+  <!-- Bootstrap CSS for styling -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* Additional custom styles */
+    body {
+      background-color: #f8f9fa;
+    }
+    .image-container {
+      margin-top: 20px;
+    }
+    .rating-system {
+      margin-top: 10px;
+    }
+    .comment-section {
+      margin-top: 20px;
+    }
+    footer {
+      margin-top: 30px;
+      background-color: #343a40;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header class="bg-dark text-white text-center py-3">
+    <h1>Paw Pics</h1>
+    <p>Find and rate your favorite dog breeds!</p>
+  </header>
+
+  <div class="container">
+    <!-- Search Bar -->
+    <div class="input-group mb-3 mt-3">
+      <input type="text" id="searchBar" class="form-control" placeholder="Search for a dog breed...">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+      </div>
+    </div>
+
+    <!-- Image Display -->
+    <div class="image-container text-center">
+      <img id="dogImage" src="" alt="Dog" class="img-fluid">
+    </div>
+
+    <!-- Rating System -->
+    <div class="rating-system text-center">
+      <span class="mr-2">Rate this dog:</span>
+      <input type="radio" name="rating" value="1"> 1 Star
+      <input type="radio" name="rating" value="2"> 2 Stars
+      <input type="radio" name="rating" value="3"> 3 Stars
+      <input type="radio" name="rating" value="4"> 4 Stars
+      <input type="radio" name="rating" value="5"> 5 Stars
+    </div>
+
+    <!-- Comment Submission -->
+    <form id="commentForm" class="comment-section">
+      <input type="text" id="commentInput" class="form-control" placeholder="Leave a comment...">
+      <button class="btn btn-primary mt-2" type="submit">Submit Comment</button>
+    </form>
+  </div>
+
+  <footer>
+    © 2024 Paw Pics. All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.5/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- Your JavaScript Code -->
+  <script src="/index.js"></script>
+</body>
+</html>
