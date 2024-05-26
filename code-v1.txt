@@ -1,0 +1,104 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const searchBar = document.getElementById('searchBar');
+    const searchButton = document.getElementById('searchButton');
+    const imageContainer = document.querySelector('.image-container');
+    const commentForm = document.getElementById('commentForm');
+    const commentInput = document.getElementById('commentInput');
+    const ratingInputs = document.getElementsByName('rating');
+    let currentImages = [];
+    let currentIndex = 0;
+    let ratingsData = {};
+  
+    // Load ratings data from local storage
+    function loadRatingsData() {
+      const storedData = localStorage.getItem('ratingsData');
+      if (storedData) {
+        ratingsData = JSON.parse(storedData);
+      }
+    }
+  
+    // Save ratings data to local storage
+    function saveRatingsData() {
+      localStorage.setItem('ratingsData', JSON.stringify(ratingsData));
+    }
+  
+    // Fetch the list of breeds
+    function fetchBreeds() {
+      return fetch('https://dog.ceo/api/breeds/list/all')
+        .then(response => response.json())
+        .then(data => data.message)
+        .catch(error => console.error('Error fetching breed list:', error));
+    }
+  
+    // Fetch images for the selected breed from The Dog API
+    async function fetchImagesForBreed(breed) {
+      try {
+        const breeds = await fetchBreeds();
+        if (breeds[breed]) {
+          const apiUrl = `https://dog.ceo/api/breed/${breed}/images`;
+          const response = await fetch(apiUrl);
+          const imageData = await response.json();
+          currentImages = imageData.message;
+          currentIndex = 0;
+          displayCurrentImage();
+        } else {
+          alert('Breed not found. Please try a different breed.');
+        }
+      } catch (error) {
+        alert('Error fetching images. Please try again later.');
+        console.error('Error fetching images:', error);
+      }
+    }
+  
+    // Display the current image
+    function displayCurrentImage() {
+      if (currentImages.length > 0) {
+        const imageUrl = currentImages[currentIndex];
+        imageContainer.innerHTML = `<img src="${imageUrl}" class="img-fluid" alt="Dog">`;
+        displayRatings(imageUrl);
+      } else {
+        imageContainer.innerHTML = '<p>No images available for this breed.</p>';
+      }
+    }
+  
+    // Display ratings for the current image
+    function displayRatings(imageUrl) {
+      const imageRatings = ratingsData[imageUrl] || { ratings: [], comments: [] };
+      const averageRating = imageRatings.ratings.length ? (imageRatings.ratings.reduce((acc, val) => acc + val, 0) / imageRatings.ratings.length).toFixed(2) : 'No ratings yet';
+      const comments = imageRatings.comments.map(comment => `<p>${comment}</p>`).join('');
+      imageContainer.innerHTML += `
+        <div>Average Rating: ${averageRating}</div>
+        <div>Comments: ${comments}</div>
+      `;
+    }
+  
+    // Event listener for the search button
+    searchButton.addEventListener('click', () => {
+      const breed = searchBar.value.trim().toLowerCase();
+      if (breed) {
+        fetchImagesForBreed(breed);
+      }
+    });
+  
+    // Event listener for the comment form submission
+    commentForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const imageUrl = currentImages[currentIndex];
+      const rating = parseInt(document.querySelector('input[name="rating"]:checked').value, 10);
+      const comment = commentInput.value.trim();
+  
+      if (!ratingsData[imageUrl]) {
+        ratingsData[imageUrl] = { ratings: [], comments: [] };
+      }
+  
+      ratingsData[imageUrl].ratings.push(rating);
+      ratingsData[imageUrl].comments.push(comment);
+  
+      saveRatingsData();
+      displayRatings(imageUrl);
+      commentForm.reset();
+    });
+  
+    loadRatingsData();
+  });
+  
