@@ -14,7 +14,7 @@
     .image-container {
       margin-top: 20px;
     }
-    .rating-system {
+    .navigation-buttons {
       margin-top: 10px;
     }
     .comment-section {
@@ -23,7 +23,7 @@
     footer {
       margin-top: 30px;
       background-color: #343a40;
-      color: rgb(17, 9, 9);
+      color: white;
       padding: 10px 0;
       text-align: center;
     }
@@ -46,7 +46,13 @@
 
     <!-- Image Display -->
     <div class="image-container text-center">
-      <img id="dogImage" src="" alt="Dog" class="img-fluid">
+      <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information -->
+      <div class="navigation-buttons">
+        <button id="prevButton">Previous</button> <!-- Button to go to the previous random image -->
+        <img id="dogImage" src="" alt="Dog" class="img-fluid">
+        <button id="nextButton">Next</button> <!-- Button to go to the next random image -->
+      </div>
+      <div id="imageRatings"></div> <!-- Container to display ratings and comments -->
     </div>
 
     <!-- Rating System -->
@@ -70,11 +76,7 @@
     © 2024 Paw Pics. All rights reserved.
   </footer>
 
- 
- 
- 
- 
-  <!-- Your JavaScript Code -->
+  <!-- JavaScript file that contains the logic for the application -->
   <script src="index.js"></script>
 </body>
 </html>
