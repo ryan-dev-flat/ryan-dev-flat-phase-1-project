@@ -96,13 +96,105 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Event listeners for the next and previous buttons
-  nextButton.addEventListener('click', () => {
-    if (currentImages.length > 1) {
-      currentIndex = (currentIndex + 1) % currentImages.length;
-      displayImage(currentImages[currentIndex]);
-      displayBreedInfo(currentImages[currentIndex]);
-    }
-  });
+ 
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
+  // Event listener for the next button
+nextButton.addEventListener('click', () => {
+  // Check if there are search results to navigate through
+  if (currentImages.length > 1) {
+    // Navigate to the next image in the search results
+    currentIndex = (currentIndex + 1) % currentImages.length;
+    displayImage(currentImages[currentIndex]);
+    displayBreedInfo(currentImages[currentIndex]);
+  } else {
+    // If there are no search results, fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+});
+
 
   prevButton.addEventListener('click', () => {
     if (currentImages.length > 1) {
