@@ -4,30 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paw Pics</title>
-  <!-- Bootstrap CSS for styling -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <style>
-    /* Additional custom styles */
-    body {
-      background-color: #f8f9fa;
-    }
-    .image-container {
-      margin-top: 20px;
-    }
-    .navigation-buttons {
-      margin-top: 10px;
-    }
-    .comment-section {
-      margin-top: 20px;
-    }
-    footer {
-      margin-top: 30px;
-      background-color: #343a40;
-      color: white;
-      padding: 10px 0;
-      text-align: center;
-    }
-  </style>
+  <!-- Link to the CSS file -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="bg-dark text-white text-center py-3">
@@ -45,15 +23,16 @@
     </div>
 
     <!-- Image Display -->
-    <div class="image-container text-center">
-      <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information -->
-      <div class="navigation-buttons">
-        <button id="prevButton">Previous</button> <!-- Button to go to the previous random image -->
-        <img id="dogImage" src="" alt="Dog" class="img-fluid">
-        <button id="nextButton">Next</button> <!-- Button to go to the next random image -->
-      </div>
-      <div id="imageRatings"></div> <!-- Container to display ratings and comments -->
-    </div>
+<div class="image-container text-center">
+  <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information -->
+  <div class="navigation-buttons">
+    <button id="prevButton" class="btn">Previous</button> <!-- Button to go to the previous random image -->
+    <img id="dogImage" src="" alt="Dog" class="img-fluid">
+    <button id="nextButton" class="btn">Next</button> <!-- Button to go to the next random image -->
+  </div>
+  <div id="imageRatings"></div> <!-- Container to display ratings and comments -->
+</div>
+
 
     <!-- Rating System -->
     <div class="rating-system text-center">
