@@ -50,7 +50,12 @@ button {
     border: none;
     background: burlywood;
 }
-
+.dog-image {
+    max-width: 500px; /* Adjust as needed */
+    max-height: 500px; /* Adjust as needed */
+    width: auto;
+    height: auto;
+  }
 button img {
     border-radius: 10px;
     margin: 0 auto;
