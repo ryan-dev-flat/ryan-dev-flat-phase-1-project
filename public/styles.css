@@ -1,6 +1,9 @@
 /* styles.css */
 
 /* Body Styles */
+/* styles.css */
+
+/* Body Styles */
 body  {
     font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     font-size: 24px;
@@ -8,44 +11,60 @@ body  {
     background: blanchedalmond;
     color: darkolivegreen;
     text-align: center;
-  }
-  header,section,footer{ display: block; }
-  h1 {
+}
+
+header,section,footer{ display: block; }
+
+h1 {
     margin: .5em 0;
     font-size: 1.2em;
-  }
-  h2 {margin:0 0 .5em 0;font-size: 1.1em}
-  form,.button p { margin: .5em 0; }
-  
-  button {
-    max-width: 90vw;
-    min-height: 50vh;
+}
+
+h2 {
+    margin:0 0 .5em 0;
+    font-size: 1.1em;
+}
+
+form,.button p { margin: .5em 0; }
+
+/* Make the search and comment fields larger */
+input[type="text"] {
+  font-size: 1.2em; /* Adjust as needed */
+  padding: 15px; /* Adjust as needed */
+}
+
+/* Make the buttons smaller */
+button {
+    max-width: 40vw; /* Adjust as needed */
+    min-height: 10vh; /* Adjust as needed */
     width: 100%;
     cursor: pointer;
     position: relative;
     text-align: center;
     border-radius: 10px;
     font-family: inherit;
-    font-size: .8em;
-    margin: 10px auto;
-    padding: 10px;
+    font-size: 1.2em; /* Adjust as needed */
+    margin: 0 auto;  /* Center the buttons horizontally */
+    display: block;  /* Make the buttons block elements so they stack vertically */
+    padding: 5px; /* Adjust as needed */
     border: none;
     background: burlywood;
-  }
-  
-  button img {
+}
+
+button img {
     border-radius: 10px;
     margin: 0 auto;
     object-fit: contain;
     max-height: 60vh;
     min-height: 200px;
     max-width: 90%;
-  }
-  button.loading img {
+}
+
+button.loading img {
     opacity: 0;
-  }
-  
-  button.loading:after {
+}
+
+button.loading:after {
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -58,22 +77,22 @@ body  {
     left: 0;
     right: 0;
     bottom: 0;
-  }
-  
-  button.error:before {
+}
+
+button.error:before {
     content: '⚠️ Oh no! No dogs found, try another breed!';
     color: firebrick;
     display: block;
     margin: 5px;
     border: 2px solid darkred;
-  }
-  
-  footer { font-size: .6em; }
-  footer a { color: #000; }
-  footer p { margin: 5px 0 0 0;}
-  
-  @media (min-width:600px) {
+}
+
+footer { font-size: .6em; }
+footer a { color: #000; }
+footer p { margin: 5px 0 0 0;}
+
+@media (min-width:600px) {
     section {
       display: flex;
     }
-  }
+}

@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return match ? match[1].replace(/-/g, ' ') : 'Unknown breed';
   }
 
-  function fetchAndDisplayRandomImage() {
+  /*function fetchAndDisplayRandomImage() {
     fetch('https://dog.ceo/api/breeds/image/random')
       .then(response => response.json())
       .then(data => {
@@ -87,6 +87,77 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(error => {
         console.error('Error fetching images for breed:', error);
         alert('An error occurred while fetching breed images. Please try again later.');
+      });
+  }
+  */
+
+  function fetchAndDisplayRandomImage() {
+    // Add the loading class
+    dogImage.classList.add('loading');
+    
+    fetch('https://dog.ceo/api/breeds/image/random')
+      .then(response => response.json())
+      .then(data => {
+        const imageUrl = data.message;
+        // Add the new image to the currentImages array
+        currentImages.push(imageUrl);
+        currentIndex = currentImages.length - 1;
+        displayImage(imageUrl);
+        displayBreedInfo(imageUrl);
+        displayRatings(imageUrl);
+        
+        // Remove the loading class
+        dogImage.classList.remove('loading');
+      })
+      .catch(error => {
+        console.error('Error fetching random image:', error);
+        
+        // Remove the loading class
+        dogImage.classList.remove('loading');
+      });
+  }
+  
+  function fetchImagesForBreed(breedInput) {
+    // Add the loading class
+    dogImage.classList.add('loading');
+    
+    const [firstWord, secondWord] = breedInput.toLowerCase().split(' ');
+    let breedPath = firstWord;
+    // If there's a second word, add it to the breed path
+    if (secondWord) {
+      // Check if the first word is a main breed
+      if (allBreeds[firstWord]) {
+        breedPath += `/${secondWord}`;
+      } else if (allBreeds[secondWord]) {
+        // If the second word is a main breed, use it as the breed and the first word as the sub-breed
+        breedPath = `${secondWord}/${firstWord}`;
+      }
+    }
+    // Fetch images
+    fetch(`https://dog.ceo/api/breed/${breedPath}/images`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          currentImages = data.message;
+          currentIndex = 0;
+          displayImage(currentImages[currentIndex]);
+          displayBreedInfo(currentImages[currentIndex]);
+          
+          // Remove the loading class
+          dogImage.classList.remove('loading');
+        } else {
+          alert('Breed not found. Please check the breed name and try again.');
+          
+          // Remove the loading class
+          dogImage.classList.remove('loading');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching images for breed:', error);
+        alert('An error occurred while fetching breed images. Please try again later.');
+        
+        // Remove the loading class
+        dogImage.classList.remove('loading');
       });
   }
   
