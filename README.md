@@ -30,6 +30,18 @@ Here is a more detailed description of the code:
 | 30-35 | `function loadRatingsData() { ... }` | This function loads the ratings data from local storage. If there is data stored under the key 'ratingsData', it is parsed from JSON format and stored in the ratingsData variable. |
 | 38-41 | `function saveRatingsData() { ... }` | This function saves the ratings data to local storage. It does this by converting the ratingsData object to a JSON string and storing it under the key 'ratingsData'. |
 | 44-48 | `function extractBreedFromUrl(url) { ... }` | This function extracts the breed from a given image URL. It does this by using a regular expression to match a specific pattern in the URL that corresponds to the breed. If a match is found, it is returned with hyphens replaced by spaces. If no match is found, the string 'Unknown breed' is returned. |
+Line 1: This line declares the function extractBreedFromUrl which takes one parameter, url. This function is used to extract the breed of the dog from the URL of the image.
+
+Line 2: This line declares a constant regex which holds the regular expression /breeds\/([a-z-]+)[\/-]/i. This regular expression is used to match the breed in the URL. Let’s break down this regular expression:
+
+breeds\/: This matches the literal string “breeds/” in the URL.
+([a-z-]+): This is a capture group that matches one or more (+) lowercase letters (a-z) or hyphens (-). This part of the URL is the breed or sub-breed of the dog.
+[\/-]: This matches either a forward slash (/) or a hyphen (-), which are the characters that can follow the breed in the URL.
+i: This is a flag that makes the regular expression case-insensitive, meaning it will match both uppercase and lowercase letters.
+Line 3: This line declares a constant match which holds the result of the match method being called on url with regex as its argument. The match method returns an array containing the matched text as the first element, followed by the results of any capture groups. If no matches are found, match method returns null.
+
+Line 4: This line returns the breed extracted from the URL. If a match was found (match ?), it takes the first capture group (match[1]), which is the breed, and replaces any hyphens with spaces (replace(/-/g, ' ')). This is done because some breeds are two words and are represented with a hyphen in the URL. If no match was found, it returns the string ‘Unknown breed’.
+
 | 51-64 | `function fetchAndDisplayRandomImage() { ... }` | This function fetches a random image from the Dog CEO API and displays it. If the request is successful, the image URL is added to the imageHistory array, currentIndex is updated to the index of the new image, lastSearch is reset to null, and the image, breed info, and ratings are displayed. If an error occurs during the request, it is logged to the console. |
 | 67-92 | `function fetchImagesForBreed(breedInput) { ... }` | This function fetches images for a specific breed from the Dog CEO API and displays them. It first constructs the breed path for the API request based on the input breed. Then it makes the request. If the request is successful, the image URLs are added to the imageHistory array, currentIndex is updated to the index of the first new image, and the image and breed info are displayed. If the breed is not found or an error occurs during the request, an alert is displayed. |
 | 95-101 | `searchButton.addEventListener('click', () => { ... });` | This block of code sets up an event listener for the 'click' event on the search button. When the button is clicked, the breed entered in the search bar is fetched and displayed. If no breed is entered, an alert is displayed. |
@@ -42,6 +54,91 @@ Here is a more detailed description of the code:
 | 183 | `loadRatingsData();` | This line calls the loadRatingsData function to load the ratings data from local storage. |
 | 184 | `fetchAndDisplayRandomImage();` | This line calls the fetchAndDisplayRandomImage function to fetch and display a random image. |
 | 185 | `});` | This line closes the function passed as the second argument to the 'DOMContentLoaded' event listener. |
+
+#Revised code:
+JavaScript
+1  document.addEventListener('DOMContentLoaded', () => {
+2    // DOM element references
+3    const elements = {
+4      searchBar: document.getElementById('searchBar'), // The search bar
+5      searchButton: document.getElementById('searchButton'), // The search button
+6      prevButton: document.getElementById('prevButton'), // The previous button
+7      nextButton: document.getElementById('nextButton'), // The next button
+8      breedInfo: document.getElementById('breedInfo'), // The breed info display
+9      imageRatings: document.getElementById('imageRatings'), // The image ratings display
+10     dogImage: document.getElementById('dogImage'), // The dog image display
+11     commentForm: document.getElementById('commentForm'), // The comment form
+12     commentInput: document.getElementById('commentInput') // The comment input field
+13   };
+
+
+Lines 1-13: This is the initialization of the script. It waits for the DOM to be fully loaded before executing the script. It then creates references to various DOM elements that will be used throughout the script.
+JavaScript
+14   let state = {
+15     imageHistory: [], // The history of images viewed
+16     currentIndex: 0, // The index of the current image in the imageHistory array
+17     ratingsData: {}, // The ratings data for each image
+18     allBreeds: {}, // All the breeds fetched from the API
+19     lastSearch: null // The last breed searched for
+20   };
+
+
+Lines 14-20: This is the state of the application. It keeps track of the images viewed, the current image index, the ratings data for each image, all the breeds fetched from the API, and the last breed searched for.
+JavaScript
+21   // Fetch all breeds and sub-breeds
+22   fetch('https://dog.ceo/api/breeds/list/all')
+23     .then(response => response.json())
+24     .then(data => {
+25       if (data.status === 'success') {
+26         state.allBreeds = data.message;
+27         console.log('All breeds data:', state.allBreeds); // Log all breeds data
+28       }
+29     })
+30     .catch(error => handleError('Error fetching all breeds:', error));
+
+
+Lines 21-30: This block of code fetches all the breeds and sub-breeds from the Dog CEO API. If the fetch is successful, it updates the allBreeds property of the state with the fetched data.
+JavaScript
+31   // Load the ratings data from local storage
+32   loadRatingsData();
+
+
+Lines 31-32: This line calls the loadRatingsData function, which loads the ratings data from the local storage.
+JavaScript
+33   // Fetch and display a random image
+34   fetchAndDisplayRandomImage();
+
+
+Lines 33-34: This line calls the fetchAndDisplayRandomImage function, which fetches and displays a random dog image.
+JavaScript
+35   // Event listener for the search button
+36   elements.searchButton.addEventListener('click', handleSearchClick);
+
+
+Lines 35-36: This line adds an event listener to the search button. When the search button is clicked, it calls the handleSearchClick function.
+JavaScript
+37   // Event listener for the next button
+38   elements.nextButton.addEventListener('click', handleNextClick);
+
+
+Lines 37-38: This line adds an event listener to the next button. When the next button is clicked, it calls the handleNextClick function.
+JavaScript
+39   // Event listener for the previous button
+40   elements.prevButton.addEventListener('click', handlePrevClick);
+
+
+Lines 39-40: This line adds an event listener to the previous button. When the previous button is clicked, it calls the handlePrevClick function.
+JavaScript
+41   // Event listener for the comment form
+42   elements.commentForm.addEventListener('submit', handleCommentSubmit);
+
+
+Lines 41-42: This line adds an event listener to the comment form. When the form is submitted, it calls the handleCommentSubmit function.
+
+The rest of the code consists of function definitions that are called in the above lines. These functions handle errors, load and save ratings data, extract breed from URL, fetch and display random images, fetch images for a specific breed, handle search click, display image, display breed info, display ratings, handle next click, handle previous click, and handle comment submit.
+
+
+
 
 Early Phase of Project for Pitch:
 // Pseudocode for Dog Breed Picture Search SPA MVF

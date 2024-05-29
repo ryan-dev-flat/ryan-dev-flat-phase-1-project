@@ -5,35 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paw Pics</title>
   <!-- Link to the CSS file -->
-  <link rel="stylesheet" type="text/css" href="styles.css">
-
+  <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Stylesheet for the page -->
 </head>
 <body>
   <header class="bg-dark text-white text-center py-3">
-    <h1>Paw Pics</h1>
-    <p>Find and rate your favorite dog breeds!</p>
+    <h1>Paw Pics</h1> <!-- Title of the page -->
+    <p>Find and rate your favorite dog breeds!</p> <!-- Description of the page -->
   </header>
 
   <div class="container">
     <!-- Search Bar -->
     <div class="input-group mb-3 mt-3">
-      <input type="text" id="searchBar" class="form-control" placeholder="Search for a dog breed...">
+      <input type="text" id="searchBar" class="form-control" placeholder="Search for a dog breed..."> <!-- Search bar for entering a breed name -->
       <div class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+        <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button> <!-- Search button, triggers handleSearchClick() in JavaScript -->
       </div>
     </div>
 
     <!-- Image Display -->
-<div class="image-container text-center">
-  <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information -->
-  <div class="navigation-buttons">
-    <button id="prevButton" class="btn">Previous</button> <!-- Button to go to the previous random image -->
-    <img id="dogImage" src="" alt="Dog Image" class="dog-image">
-    <button id="nextButton" class="btn">Next</button> <!-- Button to go to the next random image -->
-  </div>
-  <div id="imageRatings"></div> <!-- Container to display ratings and comments -->
-</div>
-
+    <div class="image-container text-center">
+      <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information, updated in displayBreedInfo() -->
+      <div class="navigation-buttons">
+        <button id="prevButton" class="btn">Previous</button> <!-- Button to go to the previous random image, triggers handlePrevClick() -->
+        <img id="dogImage" src="" alt="Dog Image" class="dog-image"> <!-- Image display, updated in displayImage() -->
+        <button id="nextButton" class="btn">Next</button> <!-- Button to go to the next random image, triggers handleNextClick() -->
+      </div>
+      <div id="imageRatings"></div> <!-- Container to display ratings and comments, updated in displayRatings() -->
+    </div>
 
     <!-- Rating System -->
     <div class="rating-system text-center">
@@ -42,13 +40,13 @@
       <input type="radio" name="rating" value="2"> 2 Stars
       <input type="radio" name="rating" value="3"> 3 Stars
       <input type="radio" name="rating" value="4"> 4 Stars
-      <input type="radio" name="rating" value="5"> 5 Stars
+      <input type="radio" name="rating" value="5"> 5 Stars <!-- Rating system for the user to rate the current image -->
     </div>
 
     <!-- Comment Submission -->
     <form id="commentForm" class="comment-section">
-      <input type="text" id="commentInput" class="form-control" placeholder="Leave a comment...">
-      <button class="btn btn-primary mt-2" type="submit">Submit Comment</button>
+      <input type="text" id="commentInput" class="form-control" placeholder="Leave a comment..."> <!-- Comment input field for the user to leave a comment -->
+      <button class="btn btn-primary mt-2" type="submit">Submit Comment</button> <!-- Comment submission button, triggers handleCommentSubmit() -->
     </form>
   </div>
 
@@ -58,7 +56,7 @@
      <p>Styles based on treats.css by <a href="https://dev.to/codepo8" target="_blank">Christian Heilmann</a></p>
   </footer>
 
- <!-- JavaScript for fetching and displaying a random dog image searching by breed to get images and commenting on and rating images-->
-<script src="index.js"></script>
+  <!-- JavaScript for fetching and displaying a random dog image, searching by breed to get images, and commenting on and rating images -->
+  <script src="index.js"></script> <!-- Link to the external JavaScript file -->
 </body>
 </html>

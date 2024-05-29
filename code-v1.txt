@@ -723,3 +723,688 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchAndDisplayRandomImage();
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM element references
+  const searchBar = document.getElementById('searchBar'); // The search bar
+  const searchButton = document.getElementById('searchButton'); // The search button
+  const prevButton = document.getElementById('prevButton'); // The previous button
+  const nextButton = document.getElementById('nextButton'); // The next button
+  const breedInfo = document.getElementById('breedInfo'); // The breed info display
+  const imageRatings = document.getElementById('imageRatings'); // The image ratings display
+  const dogImage = document.getElementById('dogImage'); // The dog image display
+  const commentForm = document.getElementById('commentForm'); // The comment form
+  const commentInput = document.getElementById('commentInput'); // The comment input field
+
+  let imageHistory = []; // The history of images viewed
+  let currentIndex = 0; // The index of the current image in the imageHistory array
+  let ratingsData = {}; // The ratings data for each image
+  let allBreeds = {}; // All the breeds fetched from the API
+  let lastSearch = null; // The last breed searched for
+
+  // Fetch all breeds and sub-breeds
+  fetch('https://dog.ceo/api/breeds/list/all')
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        allBreeds = data.message;
+        console.log('All breeds data:', allBreeds);
+      }
+    })
+    .catch(error => console.error('Error fetching all breeds:', error));
+
+  // Load the ratings data from local storage
+  function loadRatingsData() {
+    const storedData = localStorage.getItem('ratingsData');
+    if (storedData) {
+      ratingsData = JSON.parse(storedData);
+    }
+  }
+
+  // Save the ratings data to local storage
+  function saveRatingsData() {
+    localStorage.setItem('ratingsData', JSON.stringify(ratingsData));
+  }
+
+  // Extract the breed from the image URL
+  function extractBreedFromUrl(url) {
+    const regex = /breeds\/([a-z-]+)[\/-]/i;
+    const match = url.match(regex);
+    return match ? match[1].replace(/-/g, ' ') : 'Unknown breed';
+  }
+
+  // Fetch and display a random image
+  function fetchAndDisplayRandomImage() {
+    console.log('Fetching a random image...');
+    fetch('https://dog.ceo/api/breeds/image/random')
+      .then(response => response.json())
+      .then(data => {
+        const imageUrl = data.message;
+        // Add the new image to the imageHistory array
+        imageHistory.push(imageUrl);
+        currentIndex = imageHistory.length - 1;
+        // Reset lastSearch to null
+        lastSearch = null;
+        displayImage(imageUrl);
+        displayBreedInfo(imageUrl);
+        displayRatings(imageUrl);
+        console.log('Fetched a random image:', imageUrl);
+      })
+      .catch(error => console.error('Error fetching random image:', error));
+  }
+
+  // Fetch images for a specific breed
+  function fetchImagesForBreed(breedInput) {
+    console.log('Fetching images for breed:', breedInput);
+    const [firstWord, secondWord] = breedInput.toLowerCase().split(' ');
+    let breedPath = firstWord;
+    // If there's a second word, add it to the breed path
+    if (secondWord) {
+      // Check if the first word is a main breed
+      if (allBreeds[firstWord]) {
+        breedPath += `/${secondWord}`;
+      } else if (allBreeds[secondWord]) {
+        // If the second word is a main breed, use it as the breed and the first word as the sub-breed
+        breedPath = `${secondWord}/${firstWord}`;
+      }
+    }
+    // Fetch images
+    fetch(`https://dog.ceo/api/breed/${breedPath}/images`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          // Add all the images to the imageHistory array
+          imageHistory = imageHistory.concat(data.message);
+          currentIndex = imageHistory.length - data.message.length;
+          displayImage(imageHistory[currentIndex]);
+          displayBreedInfo(imageHistory[currentIndex]);
+          console.log('Fetched images for breed:', breedInput);
+        } else {
+          alert('Breed not found. Please check the breed name and try again.');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching images for breed:', error);
+        alert('An error occurred while fetching breed images. Please try again later.');
+      });
+  }
+
+  // Event listener for the search button
+  searchButton.addEventListener('click', () => {
+    const breed = searchBar.value.trim().toLowerCase();
+    if (breed) {
+      lastSearch = breed;
+      fetchImagesForBreed(breed);
+    } else {
+      alert('Please enter a breed name to search.');
+    }
+  });
+
+  // Display an image
+  function displayImage(imageUrl) {
+    console.log('Displaying image:', imageUrl);
+    dogImage.src = imageUrl;
+    // Clear the comments and ratings
+    imageRatings.innerHTML = '';
+  }
+
+  // Display breed info
+  function displayBreedInfo(imageUrl) {
+    let breed = extractBreedFromUrl(imageUrl);
+    // Split the breed name into words
+    let words = breed.split(' ');
+    // Capitalize the first letter of each word
+    words = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    // If there are two words, reverse them
+    if (words.length === 2) {
+      words.reverse();
+    }
+    // Join the words back together
+    breed = words.join(' ');
+    breedInfo.textContent = breed;
+    console.log('Displaying breed info:', breed);
+  }
+
+  // Display ratings
+  function displayRatings(imageUrl) {
+    const ratingsElement = document.getElementById('imageRatings');
+    const imageRatings = ratingsData[imageUrl] || { ratings: [], comments: [] };
+    const averageRating = imageRatings.ratings.length ? (imageRatings.ratings.reduce((a, b) => a + b, 0) / imageRatings.ratings.length).toFixed(2) : 'No ratings yet';
+    const commentsHtml = imageRatings.comments.length ? imageRatings.comments.map(comment => `<p>${comment}</p>`).join('') : '<p>No comments yet</p>';
+    ratingsElement.innerHTML = `<div>Average Rating: ${averageRating}</div><div>Comments: ${commentsHtml}</div>`;
+    console.log('Displaying ratings:', averageRating, 'and comments:', commentsHtml);
+  }
+
+  // Event listener for the next button
+  nextButton.addEventListener('click', () => {
+    console.log('Next button clicked');
+    if (currentIndex < imageHistory.length - 1) {
+      // If there are more images in the history, go to the next one
+      currentIndex++;
+      displayImage(imageHistory[currentIndex]);
+      displayBreedInfo(imageHistory[currentIndex]);
+      displayRatings(imageHistory[currentIndex]);
+    } else {
+      // If there are no more images in the history, fetch a new random image
+      fetchAndDisplayRandomImage();
+    }
+  });
+
+  // Event listener for the previous button
+  prevButton.addEventListener('click', () => {
+    console.log('Previous button clicked');
+    if (currentIndex > 0) {
+      // If there are previous images, go back to the last one
+      currentIndex--;
+      displayImage(imageHistory[currentIndex]);
+      displayBreedInfo(imageHistory[currentIndex]);
+      displayRatings(imageHistory[currentIndex]);
+    }
+  });
+
+  // Event listener for the comment form
+  commentForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const imageUrl = imageHistory[currentIndex];
+    const rating = parseInt(document.querySelector('input[name="rating"]:checked').value);
+    const comment = commentInput.value.trim();
+
+    if (!ratingsData[imageUrl]) {
+      ratingsData[imageUrl] = { ratings: [], comments: [] };
+    }
+
+    ratingsData[imageUrl].ratings.push(rating);
+    ratingsData[imageUrl].comments.push(comment);
+
+    saveRatingsData();
+    displayRatings(imageUrl);
+    commentForm.reset();
+    console.log('Comment submitted:', comment, 'with rating:', rating);
+  });
+
+  loadRatingsData();
+  fetchAndDisplayRandomImage();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM element references
+  const elements = {
+    searchBar: document.getElementById('searchBar'),
+    searchButton: document.getElementById('searchButton'),
+    prevButton: document.getElementById('prevButton'),
+    nextButton: document.getElementById('nextButton'),
+    breedInfo: document.getElementById('breedInfo'),
+    imageRatings: document.getElementById('imageRatings'),
+    dogImage: document.getElementById('dogImage'),
+    commentForm: document.getElementById('commentForm'),
+    commentInput: document.getElementById('commentInput')
+  };
+
+  let state = {
+    imageHistory: [],
+    currentIndex: 0,
+    ratingsData: {},
+    allBreeds: {},
+    lastSearch: null
+  };
+
+  // Fetch all breeds and sub-breeds
+  fetch('https://dog.ceo/api/breeds/list/all')
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        state.allBreeds = data.message;
+      }
+    })
+    .catch(error => handleError('Error fetching all breeds:', error));
+
+  // Load the ratings data from local storage
+  loadRatingsData();
+
+  // Fetch and display a random image
+  fetchAndDisplayRandomImage();
+
+  // Event listener for the search button
+  elements.searchButton.addEventListener('click', handleSearchClick);
+
+ // Event listener for the next button
+elements.nextButton.addEventListener('click', () => {
+  if (state.currentIndex < state.imageHistory.length - 1) {
+    // If there are more images in the history, go to the next one
+    state.currentIndex++;
+  } else if (state.lastSearch) {
+    // If there are no more images in the history, but a breed search was performed,
+    // fetch a new image of the same breed
+    fetchImagesForBreed(state.lastSearch);
+  } else {
+    // If there are no more images in the history and no breed search was performed,
+    // fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+  displayImage(state.imageHistory[state.currentIndex]);
+  displayBreedInfo(state.imageHistory[state.currentIndex]);
+  displayRatings(state.imageHistory[state.currentIndex]);
+});
+
+// Event listener for the previous button
+elements.prevButton.addEventListener('click', () => {
+  if (state.currentIndex > 0) {
+    // If there are previous images, go back to the last one
+    state.currentIndex--;
+    displayImage(state.imageHistory[state.currentIndex]);
+    displayBreedInfo(state.imageHistory[state.currentIndex]);
+    displayRatings(state.imageHistory[state.currentIndex]);
+  }
+});
+
+ 
+
+  // Event listener for the comment form
+  elements.commentForm.addEventListener('submit', handleCommentSubmit);
+
+  function handleError(message, error) {
+    console.error(message, error);
+    alert('An error occurred. Please try again later.');
+  }
+
+  function loadRatingsData() {
+    const storedData = localStorage.getItem('ratingsData');
+    if (storedData) {
+      state.ratingsData = JSON.parse(storedData);
+    }
+  }
+
+  function saveRatingsData() {
+    localStorage.setItem('ratingsData', JSON.stringify(state.ratingsData));
+  }
+
+  function extractBreedFromUrl(url) {
+    const regex = /breeds\/([a-z-]+)[\/-]/i;
+    const match = url.match(regex);
+    return match ? match[1].replace(/-/g, ' ') : 'Unknown breed';
+  }
+
+  function fetchAndDisplayRandomImage() {
+    fetch('https://dog.ceo/api/breeds/image/random')
+      .then(response => response.json())
+      .then(data => {
+        const imageUrl = data.message;
+        state.imageHistory.push(imageUrl);
+        state.currentIndex = state.imageHistory.length - 1;
+        state.lastSearch = null;
+        displayImage(imageUrl);
+        displayBreedInfo(imageUrl);
+        displayRatings(imageUrl);
+      })
+      .catch(error => handleError('Error fetching random image:', error));
+  }
+
+  function fetchImagesForBreed(breedInput) {
+    const [firstWord, secondWord] = breedInput.toLowerCase().split(' ');
+    let breedPath = firstWord;
+    if (secondWord) {
+      if (state.allBreeds[firstWord]) {
+        breedPath += `/${secondWord}`;
+      } else if (state.allBreeds[secondWord]) {
+        breedPath = `${secondWord}/${firstWord}`;
+      }
+    }
+    fetch(`https://dog.ceo/api/breed/${breedPath}/images`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          state.imageHistory = state.imageHistory.concat(data.message);
+          state.currentIndex = state.imageHistory.length - data.message.length;
+          displayImage(state.imageHistory[state.currentIndex]);
+          displayBreedInfo(state.imageHistory[state.currentIndex]);
+        } else {
+          alert('Breed not found. Please check the breed name and try again.');
+        }
+      })
+      .catch(error => handleError('Error fetching images for breed:', error));
+  }
+
+  function handleSearchClick() {
+    const breed = elements.searchBar.value.trim().toLowerCase();
+    if (breed) {
+      state.lastSearch = breed;
+      fetchImagesForBreed(breed);
+    } else {
+      alert('Please enter a breed name to search.');
+    }
+  }
+
+  function displayImage(imageUrl) {
+    elements.dogImage.src = imageUrl;
+    elements.imageRatings.innerHTML = '';
+  }
+
+  function displayBreedInfo(imageUrl) {
+    let breed = extractBreedFromUrl(imageUrl);
+    let words = breed.split(' ');
+    words = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    if (words.length === 2) {
+      words.reverse();
+    }
+    breed = words.join(' ');
+    elements.breedInfo.textContent = breed;
+  }
+
+  function displayRatings(imageUrl) {
+    const imageRatings = state.ratingsData[imageUrl] || { ratings: [], comments: [] };
+    const averageRating = imageRatings.ratings.length ? (imageRatings.ratings.reduce((a, b) => a + b, 0) / imageRatings.ratings.length).toFixed(2) : 'No ratings yet';
+    const commentsHtml = imageRatings.comments.length ? imageRatings.comments.map(comment => `<p>${comment}</p>`).join('') : '<p>No comments yet</p>';
+    elements.imageRatings.innerHTML = `<div>Average Rating: ${averageRating}</div><div>Comments: ${commentsHtml}</div>`;
+  }
+
+  function handleNextClick() {
+    if (state.currentIndex < state.imageHistory.length - 1) {
+      state.currentIndex++;
+      displayImage(state.imageHistory[state.currentIndex]);
+      displayBreedInfo(state.imageHistory[state.currentIndex]);
+      displayRatings(state.imageHistory[state.currentIndex]);
+    } else {
+      fetchAndDisplayRandomImage();
+    }
+  }
+
+  function handlePrevClick() {
+    if (state.currentIndex > 0) {
+      state.currentIndex--;
+      displayImage(state.imageHistory[state.currentIndex]);
+      displayBreedInfo(state.imageHistory[state.currentIndex]);
+      displayRatings(state.imageHistory[state.currentIndex]);
+    }
+  }
+
+  function handleCommentSubmit(event) {
+    event.preventDefault();
+    const imageUrl = state.imageHistory[state.currentIndex];
+    const rating = parseInt(document.querySelector('input[name="rating"]:checked').value);
+    const comment = elements.commentInput.value.trim();
+
+    if (!state.ratingsData[imageUrl]) {
+      state.ratingsData[imageUrl] = { ratings: [], comments: [] };
+    }
+
+    state.ratingsData[imageUrl].ratings.push(rating);
+    state.ratingsData[imageUrl].comments.push(comment);
+
+    saveRatingsData();
+    displayRatings(imageUrl);
+    elements.commentForm.reset();
+  }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM element references
+  const elements = {
+    searchBar: document.getElementById('searchBar'),
+    searchButton: document.getElementById('searchButton'),
+    prevButton: document.getElementById('prevButton'),
+    nextButton: document.getElementById('nextButton'),
+    breedInfo: document.getElementById('breedInfo'),
+    imageRatings: document.getElementById('imageRatings'),
+    dogImage: document.getElementById('dogImage'),
+    commentForm: document.getElementById('commentForm'),
+    commentInput: document.getElementById('commentInput')
+  };
+
+  let state = {
+    imageHistory: [],
+    currentIndex: 0,
+    ratingsData: {},
+    allBreeds: {},
+    lastSearch: null
+  };
+
+  // Fetch all breeds and sub-breeds
+  fetch('https://dog.ceo/api/breeds/list/all')
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        state.allBreeds = data.message;
+      }
+    })
+    .catch(error => handleError('Error fetching all breeds:', error));
+
+  // Load the ratings data from local storage
+  loadRatingsData();
+
+  // Fetch and display a random image
+  fetchAndDisplayRandomImage();
+
+  // Event listener for the search button
+  elements.searchButton.addEventListener('click', handleSearchClick);
+
+ // Event listener for the next button
+elements.nextButton.addEventListener('click', () => {
+  if (state.currentIndex < state.imageHistory.length - 1) {
+    // If there are more images in the history, go to the next one
+    state.currentIndex++;
+  } else if (state.lastSearch) {
+    // If there are no more images in the history, but a breed search was performed,
+    // fetch a new image of the same breed
+    fetchImagesForBreed(state.lastSearch);
+  } else {
+    // If there are no more images in the history and no breed search was performed,
+    // fetch a new random image
+    fetchAndDisplayRandomImage();
+  }
+  displayImage(state.imageHistory[state.currentIndex]);
+  displayBreedInfo(state.imageHistory[state.currentIndex]);
+  displayRatings(state.imageHistory[state.currentIndex]);
+});
+
+// Event listener for the previous button
+elements.prevButton.addEventListener('click', () => {
+  if (state.currentIndex > 0) {
+    // If there are previous images, go back to the last one
+    state.currentIndex--;
+    displayImage(state.imageHistory[state.currentIndex]);
+    displayBreedInfo(state.imageHistory[state.currentIndex]);
+    displayRatings(state.imageHistory[state.currentIndex]);
+  }
+});
+
+ 
+
+  // Event listener for the comment form
+  elements.commentForm.addEventListener('submit', handleCommentSubmit);
+
+  function handleError(message, error) {
+    console.error(message, error);
+    alert('An error occurred. Please try again later.');
+  }
+
+  function loadRatingsData() {
+    const storedData = localStorage.getItem('ratingsData');
+    if (storedData) {
+      state.ratingsData = JSON.parse(storedData);
+    }
+  }
+
+  function saveRatingsData() {
+    localStorage.setItem('ratingsData', JSON.stringify(state.ratingsData));
+  }
+
+  function extractBreedFromUrl(url) {
+    const regex = /breeds\/([a-z-]+)[\/-]/i;
+    const match = url.match(regex);
+    return match ? match[1].replace(/-/g, ' ') : 'Unknown breed';
+  }
+
+  function fetchAndDisplayRandomImage() {
+    fetch('https://dog.ceo/api/breeds/image/random')
+      .then(response => response.json())
+      .then(data => {
+        const imageUrl = data.message;
+        state.imageHistory.push(imageUrl);
+        state.currentIndex = state.imageHistory.length - 1;
+        state.lastSearch = null;
+        displayImage(imageUrl);
+        displayBreedInfo(imageUrl);
+        displayRatings(imageUrl);
+      })
+      .catch(error => handleError('Error fetching random image:', error));
+  }
+
+  function fetchImagesForBreed(breedInput) {
+    const [firstWord, secondWord] = breedInput.toLowerCase().split(' ');
+    let breedPath = firstWord;
+    if (secondWord) {
+      if (state.allBreeds[firstWord]) {
+        breedPath += `/${secondWord}`;
+      } else if (state.allBreeds[secondWord]) {
+        breedPath = `${secondWord}/${firstWord}`;
+      }
+    }
+    fetch(`https://dog.ceo/api/breed/${breedPath}/images`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          state.imageHistory = state.imageHistory.concat(data.message);
+          state.currentIndex = state.imageHistory.length - data.message.length;
+          displayImage(state.imageHistory[state.currentIndex]);
+          displayBreedInfo(state.imageHistory[state.currentIndex]);
+        } else {
+          alert('Breed not found. Please check the breed name and try again.');
+        }
+      })
+      .catch(error => handleError('Error fetching images for breed:', error));
+  }
+
+  function handleSearchClick() {
+    const breed = elements.searchBar.value.trim().toLowerCase();
+    if (breed) {
+      state.lastSearch = breed;
+      fetchImagesForBreed(breed);
+    } else {
+      alert('Please enter a breed name to search.');
+    }
+  }
+
+  function displayImage(imageUrl) {
+    elements.dogImage.src = imageUrl;
+    elements.imageRatings.innerHTML = '';
+  }
+
+  function displayBreedInfo(imageUrl) {
+    let breed = extractBreedFromUrl(imageUrl);
+    let words = breed.split(' ');
+    words = words.map(word => word.charAt(0).toUpperCase() + word.slice(1));
+    if (words.length === 2) {
+      words.reverse();
+    }
+    breed = words.join(' ');
+    elements.breedInfo.textContent = breed;
+  }
+
+  function displayRatings(imageUrl) {
+    const imageRatings = state.ratingsData[imageUrl] || { ratings: [], comments: [] };
+    const averageRating = imageRatings.ratings.length ? (imageRatings.ratings.reduce((a, b) => a + b, 0) / imageRatings.ratings.length).toFixed(2) : 'No ratings yet';
+    const commentsHtml = imageRatings.comments.length ? imageRatings.comments.map(comment => `<p>${comment}</p>`).join('') : '<p>No comments yet</p>';
+    elements.imageRatings.innerHTML = `<div>Average Rating: ${averageRating}</div><div>Comments: ${commentsHtml}</div>`;
+  }
+
+  function handleNextClick() {
+    if (state.currentIndex < state.imageHistory.length - 1) {
+      state.currentIndex++;
+      displayImage(state.imageHistory[state.currentIndex]);
+      displayBreedInfo(state.imageHistory[state.currentIndex]);
+      displayRatings(state.imageHistory[state.currentIndex]);
+    } else {
+      fetchAndDisplayRandomImage();
+    }
+  }
+
+  function handlePrevClick() {
+    if (state.currentIndex > 0) {
+      state.currentIndex--;
+      displayImage(state.imageHistory[state.currentIndex]);
+      displayBreedInfo(state.imageHistory[state.currentIndex]);
+      displayRatings(state.imageHistory[state.currentIndex]);
+    }
+  }
+
+  function handleCommentSubmit(event) {
+    event.preventDefault();
+    const imageUrl = state.imageHistory[state.currentIndex];
+    const rating = parseInt(document.querySelector('input[name="rating"]:checked').value);
+    const comment = elements.commentInput.value.trim();
+
+    if (!state.ratingsData[imageUrl]) {
+      state.ratingsData[imageUrl] = { ratings: [], comments: [] };
+    }
+
+    state.ratingsData[imageUrl].ratings.push(rating);
+    state.ratingsData[imageUrl].comments.push(comment);
+
+    saveRatingsData();
+    displayRatings(imageUrl);
+    elements.commentForm.reset();
+  }
+});
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paw Pics</title>
+  <!-- Link to the CSS file -->
+  <link rel="stylesheet" type="text/css" href="styles.css">
+
+</head>
+<body>
+  <header class="bg-dark text-white text-center py-3">
+    <h1>Paw Pics</h1>
+    <p>Find and rate your favorite dog breeds!</p>
+  </header>
+
+  <div class="container">
+    <!-- Search Bar -->
+    <div class="input-group mb-3 mt-3">
+      <input type="text" id="searchBar" class="form-control" placeholder="Search for a dog breed...">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+      </div>
+    </div>
+
+    <!-- Image Display -->
+<div class="image-container text-center">
+  <div id="breedInfo"></div> <!-- Container to display breed and sub-breed information -->
+  <div class="navigation-buttons">
+    <button id="prevButton" class="btn">Previous</button> <!-- Button to go to the previous random image -->
+    <img id="dogImage" src="" alt="Dog Image" class="dog-image">
+    <button id="nextButton" class="btn">Next</button> <!-- Button to go to the next random image -->
+  </div>
+  <div id="imageRatings"></div> <!-- Container to display ratings and comments -->
+</div>
+
+
+    <!-- Rating System -->
+    <div class="rating-system text-center">
+      <span class="mr-2">Rate this dog:</span>
+      <input type="radio" name="rating" value="1"> 1 Star
+      <input type="radio" name="rating" value="2"> 2 Stars
+      <input type="radio" name="rating" value="3"> 3 Stars
+      <input type="radio" name="rating" value="4"> 4 Stars
+      <input type="radio" name="rating" value="5"> 5 Stars
+    </div>
+
+    <!-- Comment Submission -->
+    <form id="commentForm" class="comment-section">
+      <input type="text" id="commentInput" class="form-control" placeholder="Leave a comment...">
+      <button class="btn btn-primary mt-2" type="submit">Submit Comment</button>
+    </form>
+  </div>
+
+  <footer>
+    © 2024 Paw Pics. All rights reserved. 
+    <p>Dog API used for images and breeds in public domain. </p>
+     <p>Styles based on treats.css by <a href="https://dev.to/codepo8" target="_blank">Christian Heilmann</a></p>
+  </footer>
+
+ <!-- JavaScript for fetching and displaying a random dog image searching by breed to get images and commenting on and rating images-->
+<script src="index.js"></script>
+</body>
+</html>
